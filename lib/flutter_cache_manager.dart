@@ -4,7 +4,7 @@
 library flutter_cache_manager;
 
 import 'dart:async';
-import 'dart:convert';
+import 'dart:convert' show json;
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
@@ -61,7 +61,7 @@ class CacheManager {
     var jsonCacheString = _prefs.getString(_keyCacheData);
     _cacheData = new Map();
     if (jsonCacheString != null) {
-      Map jsonCache = JSON.decode(jsonCacheString);
+      Map jsonCache = json.decode(jsonCacheString);
       jsonCache.forEach((key, data) {
         _cacheData[key] = new CacheObject.fromMap(key, data);
       });
@@ -101,14 +101,14 @@ class CacheManager {
   }
 
   _saveDataInPrefs() async {
-    Map json = new Map();
+    Map data = new Map();
 
     await synchronized(_lock, () {
       _cacheData.forEach((key, cache) {
-        json[key] = cache.toMap();
+        data[key] = cache.toMap();
       });
     });
-    _prefs.setString(_keyCacheData, JSON.encode(json));
+    _prefs.setString(_keyCacheData, json.encode(data));
 
     if (await _shouldSaveAgain()) {
       await _saveDataInPrefs();
